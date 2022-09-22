@@ -18,25 +18,26 @@ def handle_abbreviation(word):
             is_single_word = True
     return word_list
 
+def handle_punctuation_start_end(word):
+    punctuations = """!"#$%&'()*+, -./:;<=>?@[\]^_`{|}~"""
+    for c in punctuations:
+        if len(word)>0 and word[0] == c:
+            word = word.replace(c,'')
+        if len(word)>0 and word[-1] == c:
+            word = word.replace(c,'')
+    return word
+
 def handle_punctuation(word):
     punctuations = """!"#$%&'()*+, -./:;<=>?@[\]^_`{|}~"""
     word_list = []
-    # for c in punctuations:
-    #     if len(word)>0 and word[0] == c:
-    #         word = word.replace(c,'')
-    #     if len(word)>0 and word[-1] == c:
-    #         word = word.replace(c,'')
     for c in punctuations:
         if c in word:
             word_list = word.split(c)
-            # for w in word_list:
-            #     if len(w) == 0:
-            #         word_list.remove(w)
-            # print(word_list)
             return word_list
     return [word]
 
 def tokenization(word):
+    word = handle_punctuation_start_end(word)
     if word.startswith('http://'):
         result.append(word)
     else:
