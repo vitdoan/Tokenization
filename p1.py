@@ -38,14 +38,11 @@ def handle_punctuation(word):
 
 def tokenization(word):
     word = handle_punctuation_start_end(word)
-    if word.startswith('http://'):
-        result.append(word)
-    else:
-        word_list = handle_abbreviation(word)
-        for w in word_list:
-            for new_w in handle_punctuation(w):
-                if len(new_w) > 0:
-                    result.append(new_w)
+    word_list = handle_abbreviation(word)
+    for w in word_list:
+        for new_w in handle_punctuation(w):
+            if len(new_w) > 0:
+                token_result.append(new_w)
 
 def contractions(word):
     if "'" in word:
@@ -61,14 +58,21 @@ def handle_txt_array():
         word = txt_array[i].lower().strip()
         word = contractions(word)
         if word == 'mr.' or word == 'mrs.':
-            result.append(word+txt_array[i+1].strip())
+            token_result.append(word+txt_array[i+1].strip())
             i += 1
         else:
             tokenization(word)
         i += 1
 
+def handle_stop_word():
+    stop_word_file = open('./text/stopwords.txt','r')
+    StopLines = stop_word_file.readlines()
+    for stop_word in StopLines:
+        while stop_word.strip() in token_result:
+            token_result.remove(stop_word.strip())
+
 txt_array = []
-result = []
+token_result = []
 Lines = f.readlines()
 for line in Lines:
     line_array = line.split(' ')
@@ -77,6 +81,7 @@ print(txt_array)
 print('')
 
 handle_txt_array()
-print(result)
+handle_stop_word()
+print(token_result)
 
 f.close()
