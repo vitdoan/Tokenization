@@ -1,3 +1,5 @@
+from matplotlib import pyplot 
+
 # PART A
 def handle_abbreviation(word): 
     word_list = []
@@ -18,12 +20,19 @@ def handle_abbreviation(word):
     return word_list
 
 def handle_punctuation(word):
-    punctuations = """!"#$%&'()*+, -./:;<=>?@[\]^_`{|}~"""
-    word_list = [word]
-    for c in punctuations:
-        for word in word_list:
-            if c in word:
-                word_list = word.split(c)
+    punctuations = """!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"""
+    word_list = []
+    i = 0
+    j = 0
+    if 'mr.' in word or 'mrs' in word:
+        word = word.replace('.','')
+        word = word.replace(' ','')
+        return [word]
+    while i < len(word):
+        if word[i] in punctuations:
+            word_list.append(word[j:i])
+            j = i+1
+        i += 1
     if len(word_list) == 0:
         return [word]
     return word_list
@@ -34,6 +43,7 @@ def tokenization(word, token_result):
         for new_w in handle_punctuation(w):
             if len(new_w) > 0:
                 token_result.append(new_w)
+    return token_result
 
 def contractions(word):
     if "'" in word:
@@ -48,11 +58,7 @@ def handle_txt_array(txt_array, token_result):
     while i < len(txt_array):
         word = txt_array[i].lower().strip()
         word = contractions(word)
-        if word == 'mr.' or word == 'mrs.':
-            token_result.append(word+txt_array[i+1].strip())
-            i += 1
-        else:
-            tokenization(word, token_result)
+        token_result = tokenization(word, token_result)
         i += 1
     return token_result
 
@@ -203,39 +209,60 @@ write_f.close()
 #############################################################################################################################
 #PART B
 
-# f_b = open('./tokenization-input-part-B.txt','r')
-# part_b_txt_array = []
-# Lines_B = f_b.readlines()
-# for line in Lines_B:
-#     line_array = line.split(' ')
-#     part_b_txt_array = part_b_txt_array + line_array
+f_b = open('./tokenization-input-part-B.txt','r')
+part_b_txt_array = []
+Lines_B = f_b.readlines()
+for line in Lines_B:
+    line_array = line.split(' ')
+    part_b_txt_array = part_b_txt_array + line_array
 
-# result_b = handle_part_a(part_b_txt_array)
+result_b = handle_part_a(part_b_txt_array)
 
-# f_b.close()
+f_b.close()
 
-# def handle_most_freq(term_dict):
-#     return
+def handle_most_freq(term_dict):
+    return
 
-# def count_term(token_array):
-#     term_count = {}
-#     for token in token_array:
-#         if token not in term_count:
-#             term_count[token] = 1
-#         else:
-#             term_count[token] += 1
-#     return term_count
+def count_term(token_array):
+    term_count = {}
+    growth = []
+    word = 1
+    vocab = 0
+    
+    for token in token_array:
+        if token not in term_count:
+            term_count[token] = 1
+        else:
+            term_count[token] += 1
+    return term_count
+ 
+def handle_part_b(token_array):
+    term_count = {}
+    growth = []
+    vocab = 0
+    word = 1
+    
+    for token in token_array:
+        if token not in term_count:
+            term_count[token] = 1
+            vocab = vocab + 1
+        else:
+            term_count[token] += 1
+        word = word + 1
+        growth.append((word, vocab))
 
-# def handle_part_b(token_array):
-#     most_freq_term = {}
-#     count_dict = count_term(token_array)
-#     sorted_count_dict = sorted(count_dict.items(), key=lambda x : x[1], reverse=True)
-#     return sorted_count_dict
+    pyplot.plot([e[0] for e in growth],[e[1] for e in growth]) 
+    pyplot.xlabel('Collection word count')
+    pyplot.ylabel('Vocabulary word count')  
+    pyplot.show()
+    
+    sorted_count_dict = sorted(term_count.items(), key=lambda x : x[1], reverse=True)
+    top_300_word = sorted_count_dict[:300]
+    return top_300_word
 
-# print(handle_part_b(result_b))
+most_freq_words = handle_part_b(result_b)
 
-# write_f_b = open("./tokenized-B.txt", "w")
-# for word in result_b:
-#     write_f_b.write(str(word)+'\n')       
-# write_f.close()
-
+write_f_b = open("./tokenized-B.txt", "w")
+for word in most_freq_words:
+    write_f_b.write(str(word)+'\n')
+write_f.close()
